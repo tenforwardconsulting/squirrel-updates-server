@@ -47,14 +47,8 @@ function getLatestReleaseForChannel(channel, page, callback) {
       // Exclude drafts
       releases = releases && releases.filter(r => !r.draft) || [];
 
-      const invertedChannels = {
-        dev: [],
-        beta: ['dev'],
-        stable: ['beta', 'dev']
-      };
-
       const release = releases.find(release => {
-        return !invertedChannels[channel].find(ic => release.name.includes(ic));
+        return release.tag_name.includes(channel);
       });
 
       if (release) {

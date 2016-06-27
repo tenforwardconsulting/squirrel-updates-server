@@ -6,23 +6,23 @@ export default {
     api: {
       version: '3.0.0',
       headers: {
-        'user-agent': 'Aluxian/squirrel-updates-server'
+        'user-agent': 'tenforward/intoxiclock-update-server'
       }
     }
   },
   sentry: {
     dsn: process.env.SENTRY_DSN
   },
-  user: process.env.REPO_OWNER || 'Aluxian',
-  repo: process.env.REPO_NAME || 'Whatsie',
-  privateRepo: process.env.UPDATES_PRIVATE_REPO || false,
+  user: process.env.REPO_OWNER || 'tenforwardconsulting',
+  repo: process.env.REPO_NAME || 'intoxiclock',
+  privateRepo: process.env.UPDATES_PRIVATE_REPO || true,
   patterns: {
     darwin: {
-      dmg: /-osx\.dmg/,
-      zip: /-osx\.zip/
+      dmg: /\.dmg/,
+      zip: /-mac\.zip/
     },
     win32: {
-      installer: /-win32-setup\.exe/,
+      installer: /\.exe/,
       zip: /-win32-portable\.zip/
     },
     linux: {

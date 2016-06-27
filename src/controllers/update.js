@@ -5,18 +5,26 @@ import {getReleaseByTag, getLatestRelease, getPublicDownloadUrl} from '../compon
 import config from '../config';
 import semver from 'semver';
 
+function isValidChannel(channel) {
+  return ["production", "beta", "dev"].includes(channel);
+}
+
 export async function darwin(req, res) {
-  const channel = req.params.channel || 'dev';
-  if (!['stable', 'beta', 'dev'].includes(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
+  const channel = req.query.channel || 'dev';
+  console.log("channel: " + channel);
+  if (!isValidChannel(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
 
   const version = req.query.version;
+  console.log("version: " + version);
   if (!semver.valid(version)) throw new BadRequestError(`Invalid version '${version}'.`);
 
   const latestRelease = await getLatestRelease(channel);
   if (!latestRelease) throw new NotFoundError('Latest release not found.');
 
   const latestVersion = semver.clean(latestRelease.tag_name);
-  const shouldUpdate = semver.lt(version, latestVersion);
+  const shouldUpdate = semver.lt(version, latestVersion) || channel === "dev";
+  console.log("latestVersion: " + latestVersion);
+  console.log("shouldUpdate: " + shouldUpdate);
 
   if (shouldUpdate) {
     const asset = latestRelease.assets.find(a => a.name.match(config.patterns.darwin.zip));
@@ -41,8 +49,8 @@ export async function darwin(req, res) {
 }
 
 export async function win32_portable(req, res) {
-  const channel = req.params.channel || 'dev';
-  if (!['stable', 'beta', 'dev'].includes(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
+  const channel = req.query.channel || 'dev';
+  if (!isValidChannel(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
 
   const latestRelease = await getLatestRelease(channel);
   if (!latestRelease) throw new NotFoundError('Latest release not found.');
@@ -65,8 +73,8 @@ export async function win32_portable(req, res) {
 }
 
 export async function win32_file(req, res) {
-  const channel = req.params.channel || 'dev';
-  if (!['stable', 'beta', 'dev'].includes(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
+  const channel = req.query.channel || 'dev';
+  if (!isValidChannel(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
 
   const fileName = req.params.file;
   if (!fileName) throw new BadRequestError(`Invalid file '${fileName}'.`);
@@ -97,8 +105,8 @@ export async function win32_file(req, res) {
 }
 
 export async function linux(req, res) {
-  const channel = req.params.channel || 'dev';
-  if (!['stable', 'beta', 'dev'].includes(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
+  const channel = req.query.channel || 'dev';
+  if (!isValidChannel(channel)) throw new BadRequestError(`Invalid channel '${channel}'.`);
 
   const arch = req.query.arch || '';
   const pkg = req.query.pkg || '';
