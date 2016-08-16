@@ -85,7 +85,7 @@ export async function win32_file(req, res) {
 
   if (fileVersion) {
     // Find the release and download from it
-    release = await getReleaseByTag('v' + fileVersion);
+    release = await getLatestRelease(channel);
     if (!release) throw new NotFoundError(`Release not found for version '${fileVersion}'.`);
   } else {
     // Download from the latest release
